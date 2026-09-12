@@ -1,0 +1,13 @@
+# npm install で作られるフォルダ（第7章で説明）
+# 中身が多いが、npm install を実行すれば誰でも作り直せるため、Gitでは管理しない
+node_modules/
+
+# 接続文字列などの秘密の情報を書くファイル
+# .env は第9章、.env.test は第11章で説明する。他の人に見えると困るため、Gitでは管理しない
+.env
+.env.test
+
+# OSが自動で作るファイル（Windows / Mac の両方に対応するための行）
+# アプリの動作には関係がないため、Gitでは管理しない
+.DS_Store
+Thumbs.db
