@@ -1,0 +1,59 @@
+name: CI
+
+# mainやブランチにpushしたとき、プルリクエストを作ったときに実行する（第11章で説明）
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # テスト用に、このワークフローの中だけで使う一時的なPostgreSQLを起動する。
+    # Neonではなく、GitHub Actionsが用意するコンテナを使う（第11章で説明）
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: tasks_test
+        ports:
+          - 5432:5432
+        # PostgreSQLの起動が終わるのを待ってから、次のステップに進むための確認
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # 上のPostgreSQLへの接続文字列。SSLは使わない（第9章のNeonとの違い）
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tasks_test
+      APP_ENV: test
+
+    steps:
+      - name: リポジトリを取得する
+        uses: actions/checkout@v4
+
+      - name: Node.jsをセットアップする
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: 依存関係をインストールする（package-lock.jsonのバージョンどおりに）
+        run: npm ci
+
+      - name: テストを実行する
+        run: |
+          # テストが1件も実行されないまま、CIが成功扱いにならないようにする。
+          # node --testは0件でも終了コード0になるため、実行結果の件数を
+          # 自分で確認している（第11章で説明。完成済みのコードとして提供）
+          set -o pipefail
+          npm test | tee test-output.txt
+          test_exit_code=$?
+          if grep -q "tests 0" test-output.txt; then
+            echo "テストが1件も実行されていません。tests/にテストファイルがあるか確認してください。"
+            exit 1
+          fi
+          exit $test_exit_code
