@@ -1,0 +1,112 @@
+### ヘルスチェック
+GET http://localhost:3000/health
+
+### タスク一覧を取得する
+GET http://localhost:3000/api/tasks
+
+### タスクを追加する
+POST http://localhost:3000/api/tasks
+Content-Type: application/json
+
+{
+  "title": "牛乳を買う"
+}
+
+### 空のタイトルで追加する（400になることを確認する）
+POST http://localhost:3000/api/tasks
+Content-Type: application/json
+
+{
+  "title": ""
+}
+
+### 空白だけのタイトルで追加する（400になることを確認する）
+POST http://localhost:3000/api/tasks
+Content-Type: application/json
+
+{
+  "title": "   "
+}
+
+### タイトルが文字列以外（400になることを確認する）
+POST http://localhost:3000/api/tasks
+Content-Type: application/json
+
+{
+  "title": 123
+}
+
+### Content-Typeヘッダーを付け忘れた場合（400になることを確認する。第8章のつまずきの再現）
+POST http://localhost:3000/api/tasks
+
+{
+  "title": "牛乳を買う"
+}
+
+### ボディなしで追加する（400になることを確認する）
+POST http://localhost:3000/api/tasks
+
+### 壊れたJSON：末尾に余分なカンマ（400になることを確認する）
+POST http://localhost:3000/api/tasks
+Content-Type: application/json
+
+{
+  "title": "牛乳を買う",
+}
+
+### 壊れたJSON：ダブルクォートがない（400になることを確認する）
+POST http://localhost:3000/api/tasks
+Content-Type: application/json
+
+{title: "牛乳を買う"}
+
+### 完了状態を更新する（idは一覧取得の結果に合わせて書き換える）
+PUT http://localhost:3000/api/tasks/1
+Content-Type: application/json
+
+{
+  "done": true
+}
+
+### 存在しないidを更新する（404になることを確認する）
+PUT http://localhost:3000/api/tasks/9999
+Content-Type: application/json
+
+{
+  "done": true
+}
+
+### doneが真偽値以外（400になることを確認する）
+PUT http://localhost:3000/api/tasks/1
+Content-Type: application/json
+
+{
+  "done": "yes"
+}
+
+### ボディなしで更新する（400になることを確認する）
+PUT http://localhost:3000/api/tasks/1
+
+### Content-Typeヘッダーを付け忘れた場合（400になることを確認する。第8章のつまずきの再現）
+PUT http://localhost:3000/api/tasks/1
+
+{
+  "done": true
+}
+
+### 壊れたJSON：末尾に余分なカンマ（400になることを確認する）
+PUT http://localhost:3000/api/tasks/1
+Content-Type: application/json
+
+{
+  "done": true,
+}
+
+### タスクを削除する（idは一覧取得の結果に合わせて書き換える）
+DELETE http://localhost:3000/api/tasks/1
+
+### 存在しないidを削除する（404になることを確認する）
+DELETE http://localhost:3000/api/tasks/9999
+
+### 存在しないAPIのURL（404になることを確認する。第8章のURL打ち間違いの再現）
+GET http://localhost:3000/api/tsaks
